@@ -23,16 +23,16 @@ int main(void)
     clock_t start = clock();
     for (int i = 0; i < (VECTOR_COUNT * 3 / V3_SUB); i++)
     {
-        __m128 v_1 = _mm_loadu_ps(&vectors[i][0]);
-        __m128 v_2 = _mm_loadu_ps(&vectors[i][4]);
-        __m128 v_3 = _mm_loadu_ps(&vectors[i][8]);
-        __m128 v_4 = _mm_loadu_ps(&vectors[i][12]);
+        __m128 v_1 = _mm_load_ps(&vectors[i][0]);
+        __m128 v_2 = _mm_load_ps(&vectors[i][4]);
+        __m128 v_3 = _mm_load_ps(&vectors[i][8]);
+        __m128 v_4 = _mm_load_ps(&vectors[i][12]);
 
         __m128 v_res_1 = _mm_add_ps(v_1, v_3);
         __m128 v_res_2 = _mm_add_ps(v_2, v_4);
 
-        _mm_storeu_ps(&vectors[i][0], v_res_1);
-        _mm_storeu_ps(&vectors[i][4], v_res_2);
+        _mm_store_ps(&vectors[i][0], v_res_1);
+        _mm_store_ps(&vectors[i][4], v_res_2);
     }
     clock_t end = clock();
 
