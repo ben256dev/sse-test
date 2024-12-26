@@ -12,7 +12,7 @@ int main(void)
 #define VECTORS_BYTES VECTOR_COUNT * sizeof(v3)
     v3_4* vectors = xmalloc(VECTORS_BYTES);
 
-    if (RAND_bytes((unsigned char*)vectors, sizeof(vectors)) != 1)
+    if (RAND_bytes((unsigned char*)vectors, VECTORS_BYTES) != 1)
         die("RAND_bytes()");
 
     clock_t start = clock();
