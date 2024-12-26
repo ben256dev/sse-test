@@ -6,6 +6,8 @@
 #include <immintrin.h>
 #include <pthread.h>
 
+#include <windows.h>
+
 typedef float v3[3];
 #define V3_SUB 32
 typedef float v3_32[V3_SUB];
@@ -49,7 +51,13 @@ int main(void)
     pthread_t threads[THREAD_COUNT];
     v3_32_add_param params[THREAD_COUNT];
 
-    clock_t start = clock();
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER start;
+    LARGE_INTEGER end;
+
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+
     for (int i = 0; i < THREAD_COUNT; i++)
     {
         params[i].vectors = vectors + (i * INDIV_WORK);
@@ -59,9 +67,11 @@ int main(void)
     }
     for (int i = 0; i < THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
-    clock_t end = clock();
 
-    printf("%ld\n", end - start);
+    QueryPerformanceCounter(&end);
+    unsigned long long elapsed = (unsigned long long)((end.QuadPart - start.QuadPart) * 1000000.0 / frequency.QuadPart);
+
+    printf("%llu\n", elapsed);
 
     _mm_free(vectors);
 

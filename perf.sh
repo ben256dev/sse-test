@@ -1,6 +1,6 @@
 #!/bin/bash
 
-N=${N:-15}
+N=${N:-10}
 
 touch_n()
 {
@@ -25,11 +25,11 @@ res_sum()
 {
     for r in $(ls | grep '\.res$'); do
         sum=$(awk '{sum += $1} END { print sum}' "$r")
-        printf "%3d %s\n" "$sum" "$r"
+        printf "%7dus %s\n" "$sum" "$r"
     done
 }
 
-x_list="$(ls | grep '\.exe$')"
+x_list="$(ls | grep '\.exe$') gl_v3_add.exe"
 
 touch_n $x_list
 

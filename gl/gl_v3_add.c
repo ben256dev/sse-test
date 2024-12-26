@@ -17,7 +17,9 @@ int run_vector_stuff(GLuint program)
     if (RAND_bytes((unsigned char*)vectors, VECTORS_BYTES) != 1)
         die("RAND_bytes()");
 
-    clock_t start = clock();
+    GLuint query;
+    glGenQueries(1, &query);
+    glQueryCounter(query, GL_TIMESTAMP);
 
     GLuint ssbo;
     glGenBuffers(1, &ssbo);
@@ -37,9 +39,19 @@ int run_vector_stuff(GLuint program)
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glDeleteBuffers(1, &ssbo);
 
-    clock_t end = clock();
+    GLuint query_end;
+    glGenQueries(1, &query_end);
+    glQueryCounter(query_end, GL_TIMESTAMP);
+
+    GLuint64 start_time;
+    GLuint64 end_time;
+
+    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &start_time);
+    glGetQueryObjectui64v(query_end, GL_QUERY_RESULT, &end_time);
+
+    GLuint64 elapsed_time = (end_time - start_time) / 1000;
     
-    printf("%ld\n", end - start);
+    printf("%llu\n", elapsed_time);
     glDeleteProgram(program);
     glfwTerminate();
 

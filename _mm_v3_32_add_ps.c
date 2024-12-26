@@ -5,6 +5,8 @@
 #include <malloc.h>
 #include <emmintrin.h>
 
+#include <windows.h>
+
 typedef float v3[3];
 #define V3_SUB 32
 typedef float v3_32[V3_SUB];
@@ -20,7 +22,13 @@ int main(void)
     if (RAND_bytes((unsigned char*)vectors, VECTORS_BYTES) != 1)
         die("RAND_bytes()");
 
-    clock_t start = clock();
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER start;
+    LARGE_INTEGER end;
+
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+
     for (int i = 0; i < (VECTOR_COUNT * 3 / V3_SUB); i++)
     {
         __m128 v_1 = _mm_load_ps(&vectors[i][0]);
@@ -42,9 +50,11 @@ int main(void)
         _mm_store_ps(&vectors[i][8],  v_res_3);
         _mm_store_ps(&vectors[i][12], v_res_4);
     }
-    clock_t end = clock();
 
-    printf("%ld\n", end - start);
+    QueryPerformanceCounter(&end);
+    unsigned long long elapsed = (unsigned long long)((end.QuadPart - start.QuadPart) * 1000000.0 / frequency.QuadPart);
+
+    printf("%llu\n", elapsed);
 
     _mm_free(vectors);
 

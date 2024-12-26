@@ -2,9 +2,14 @@
 
 OPENSSLDIR="/c/Program Files/OpenSSL-Win64/"
 
-for c in $(ls | grep '\.c$'); do
+compile()
+{
     #Windows
     gcc -I"$INCLUDE" -I"${OPENSSLDIR}include" -L"$LIB" -L"${OPENSSLDIR}" \
         -O3 -march=native -ffast-math -funroll-loops -flto -mavx2 \
-        -o "${c:0:-2}" "$c" -lcrypto -lbutil
+        -o "${c:0:-2}" "$1" -lcrypto -lbutil
+}
+
+for c in $(ls | grep '\.c$'); do
+    compile $c
 done
