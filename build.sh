@@ -6,7 +6,7 @@ compile()
 {
     #Windows
     gcc -I"$INCLUDE" -I"${OPENSSLDIR}include" -L"$LIB" -L"${OPENSSLDIR}" \
-        -O3 -march=native -ffast-math -funroll-loops -flto -mavx2 \
+        -O3 -march=native \
         -o "${c:0:-2}" "$1" -lcrypto -lbutil
 }
 
