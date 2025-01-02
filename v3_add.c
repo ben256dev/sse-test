@@ -2,19 +2,22 @@
 #include <butil/butil.h>
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <windows.h>
 
 typedef float v3[3];
 
-int main(void)
+u64 spec_summation_time(const char* spec_file)
 {
-#define VECTOR_COUNT 8388608
-#define VECTORS_BYTES VECTOR_COUNT * sizeof(v3)
-    v3* vectors = xmalloc(VECTORS_BYTES);
+    v3* vectors = xmfopen(spec_file);
 
-    if (RAND_bytes((unsigned char*)vectors, VECTORS_BYTES) != 1)
-        die("RAND_bytes()");
+    const char* count_str = spec_file;
+    for (int i = 0; i < 128 && spec_file[i] != '\0'; i++)
+        if (spec_file[i] == '.')
+            count_str = &spec_file[i + 1];
+
+    int vector_count = strtol(count_str, 0, 10);
 
     LARGE_INTEGER frequency;
     LARGE_INTEGER start;
@@ -23,19 +26,31 @@ int main(void)
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&start);
 
-    for (int i = 0; i < VECTOR_COUNT/2; i++)
+    for (int i = 0; i < vector_count/2; i++)
     {
-        vectors[i][0] += vectors[i + VECTOR_COUNT/2][0];
-        vectors[i][1] += vectors[i + VECTOR_COUNT/2][1];
-        vectors[i][2] += vectors[i + VECTOR_COUNT/2][2];
+        vectors[i][0] += vectors[i + vector_count/2][0];
+        vectors[i][1] += vectors[i + vector_count/2][1];
+        vectors[i][2] += vectors[i + vector_count/2][2];
     }
 
     QueryPerformanceCounter(&end);
-    unsigned long long elapsed = (unsigned long long)((end.QuadPart - start.QuadPart) * 1000000.0 / frequency.QuadPart);
+    u64 elapsed = (u64)((end.QuadPart - start.QuadPart) * 1000000.0 / frequency.QuadPart);
 
     printf("%llu\n", elapsed);
 
     free(vectors);
+}
+
+int main(int argc, char* argv[])
+{
+    argc--;
+    argv++;
+
+    if (argc < 0)
+        lie("no filenames specified");
+
+    for (int i = 0; i < argc; i++)
+        puts("%llu", spec_summation_time(argv));
 
     return 0;
 }
